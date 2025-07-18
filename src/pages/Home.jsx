@@ -6,28 +6,29 @@ const Home = () => {
   const [url, setUrl] = useState("");
   const [playlist, setPlaylist] = useState(null);
   const [format, setFormat] = useState("mp3");
-  const [loading, setLoading] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(false);
+  const [downloadLoading, setDownloadLoading] = useState(false);
 
   const handleFetch = async () => {
-    setLoading(true);
+    setFetchLoading(true);
     try {
       const data = await fetchPlaylistInfo(url);
       setPlaylist(data);
     } catch (err) {
       alert("Failed to fetch playlist");
     } finally {
-      setLoading(false);
+      setFetchLoading(false);
     }
   };
 
   const handleDownload = async () => {
-    setLoading(true);
+    setDownloadLoading(true);
     try {
       await downloadPlaylist(url, format);
     } catch (err) {
       alert("Download failed");
     } finally {
-      setLoading(false);
+      setDownloadLoading(false);
     }
   };
 
@@ -79,10 +80,10 @@ const Home = () => {
               <div className="sm:col-span-2 lg:col-span-2">
                 <button
                   onClick={handleFetch}
-                  disabled={!url.trim() || loading}
+                  disabled={!url.trim() || fetchLoading}
                   className="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-2xl hover:from-purple-700 hover:to-indigo-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:transform-none text-sm sm:text-base"
                 >
-                  {loading ? (
+                  {fetchLoading ? (
                     <span className="flex items-center justify-center space-x-2">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       <span>Fetching...</span>
@@ -111,10 +112,10 @@ const Home = () => {
               <div className="lg:col-span-1">
                 <button
                   onClick={handleDownload}
-                  disabled={!playlist || loading}
+                  disabled={!playlist || downloadLoading}
                   className="w-full px-6 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-2xl hover:from-emerald-700 hover:to-teal-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:transform-none text-sm sm:text-base"
                 >
-                  {loading ? "Downloading..." : "Download"}
+                  {downloadLoading ? "Downloading..." : "Download"}
                 </button>
               </div>
             </div>
@@ -122,11 +123,13 @@ const Home = () => {
         </div>
 
         {/* Loading State */}
-        {loading && (
+        {(fetchLoading || downloadLoading) && (
           <div className="bg-purple-50 border border-purple-200 rounded-3xl p-6 mb-8">
             <div className="flex items-center justify-center space-x-3 text-purple-700">
               <div className="w-6 h-6 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-              <p className="font-medium">Processing your request...</p>
+              <p className="font-medium">
+                {fetchLoading ? "Fetching playlist..." : "Downloading..."}
+              </p>
             </div>
           </div>
         )}
